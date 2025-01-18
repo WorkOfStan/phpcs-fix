@@ -70,6 +70,7 @@ runs:
         php-version: "${{ inputs.php-version }}"
         tools: composer:v2
 
+    # todo consider using cache
     - name: "Use the latest PHPCS version"
       run: composer require --dev squizlabs/php_codesniffer --prefer-dist --no-progress
       shell: bash
@@ -107,6 +108,15 @@ runs:
 
         # restore composer.json before staging the changes
         git checkout composer.json
+
+        # Check for fixable changes
+        if [ -z "$(git status --porcelain)" ]; then
+          echo "::warning title=No fixable errors were found by phpcbf::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+          # Exiting gracefully
+          exit 0
+          # The rest of the script must still be within the same step to really stop the execution
+        fi
+
         git add .
 
         # Determine branch name based on commit-changes input
