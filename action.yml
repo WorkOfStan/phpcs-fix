@@ -108,7 +108,11 @@ runs:
       if: env.HAS_ISSUES == 'true'
       run: |
         echo "phpcbf standard=${{ env.USE_STANDARD }}"
-        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
+        : "${MORE_ISSUES:=false}"
+        if [ "${MORE_ISSUES}" = "true" ]; then
+          echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+        fi
 
         # restore composer.json before staging the changes
         git checkout composer.json
@@ -151,4 +155,9 @@ runs:
 
         # Set branch name as output
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+        
+        # Stop with an error if some manual fixes are required on top of automatic fixes
+        if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
+          exit 1
+        fi
       shell: bash
