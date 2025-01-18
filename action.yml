@@ -87,10 +87,10 @@ runs:
         elif [ -f .github/linters/phpcs.xml ]; then
           use_standard=".github/linters/phpcs.xml"
         else
-          use_standard="$GITHUB_ACTION_PATH/.github/linters/super-linter-templates-phpcs.xml"          
+          use_standard="$GITHUB_ACTION_PATH/.github/linters/super-linter-templates-phpcs.xml"
         fi
-        echo "USE_STANDARD=$use_standard" >> "$GITHUB_ENV"
-        echo "standard=${{ env.USE_STANDARD }}"
+        echo "USE_STANDARD=$use_standard" >> "$GITHUB_ENV" # for subsequent steps
+        echo "phpcs standard=$use_standard"
         vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="$use_standard" --ignore="${{ inputs.ignore }}" || HAS_ISSUES=true
         # because of `||`, the previous command always exit 0
 
@@ -102,6 +102,7 @@ runs:
     - name: Run PHP Code Beautifier if needed
       if: env.HAS_ISSUES == 'true'
       run: |
+        echo "phpcbf standard=${{ env.USE_STANDARD }}"
         vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
 
         # restore composer.json before staging the changes
