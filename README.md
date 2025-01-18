@@ -2,7 +2,7 @@
 
 **PHP Code Beautifier and Fixer** is a GitHub Action that checks your PHP code for style issues using the supported [PHPCSStandards/PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer/) and automatically attempts to fix them using phpcbf ensuring compatibility with [Super-Linter](https://github.com/super-linter/super-linter).
 (Note that the original [squizlabs/PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) was abandoned.)
-It can either commit changes directly to the current branch or create a new branch if you prefer manual review via pull request.
+This action can either commit changes directly to the current branch or create a new branch if you prefer manual review via pull request.
 
 ## Features
 

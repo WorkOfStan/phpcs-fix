@@ -13,6 +13,6 @@ jobs:
     steps:
       - name: Invoke the PHPCS check and PHPCBF fix
         # Use the latest commit in the main branch.
-        uses: WorkOfStan/phpcs-fix@feature/init
+        uses: WorkOfStan/phpcs-fix@main
         with:
           commit-changes: true
