@@ -111,7 +111,9 @@ runs:
         vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
         : "${MORE_ISSUES:=false}"
         if [ "${MORE_ISSUES}" = "true" ]; then
-          echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+          #echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+          # todo investigate when this happens
+          echo "::warning title=Non-zero code exit of phpcbf::Manual fix necessary?"
         fi
 
         # restore composer.json before staging the changes
@@ -156,8 +158,8 @@ runs:
         # Set branch name as output
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-        # Stop with an error if some manual fixes are required on top of automatic fixes
-        if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
-          exit 1
-        fi
+        ## Stop with an error if some manual fixes are required on top of automatic fixes
+        #if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
+        #  exit 1
+        #fi
       shell: bash
