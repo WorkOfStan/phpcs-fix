@@ -32,6 +32,6 @@ jobs:
 
   super-linter:
     needs: prettier-fix
-    uses: WorkOfStan/seablast-actions/.github/workflows/linter.yml@feature/fetch-latest
+    uses: WorkOfStan/seablast-actions/.github/workflows/linter.yml@v0.2.1
     with:
       runs-on: "ubuntu-24.04"

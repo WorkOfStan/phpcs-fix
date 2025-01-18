@@ -1,0 +1,127 @@
+---
+name: "PHP Code Beautifier and Fixer"
+description: Sniff the PHP code and beautify it if necessary.
+
+author:
+  name: "Stanislav Rejthar"
+  email: "rejthar@stanislavrejthar.com"
+  url: "https://github.com/WorkOfStan"
+
+branding:
+  icon: "check-circle"
+  color: "blue"
+
+inputs:
+  commit-changes:
+    description: "If true, commit changes to the current branch"
+    type: boolean
+    default: false
+  commit-message:
+    description: "Commit message for the changes"
+    type: string
+    default: "PHP Code Beautifier fixes applied automatically"
+  # https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Advanced-Usage#specifying-valid-file-extensions
+  # By default, PHP_CodeSniffer will check any file it finds with a .inc, .php, .js or .css extension, although not all standards will actually check all these file types.
+  # Empty value means no checking at all.
+  # The default is `php` as js and css are handled by prettier.
+  # Btw: JS/CSS support will be removed from PHP_CodeSniffer in PHPCS 4.x. Source: https://phpcsutils.com/
+  extensions:
+    description: "Comma delimited list of extensions to be sniffed"
+    required: false
+    type: string
+    default: "php" # "php,inc,lib"
+  ignore:
+    description: "Ignore files based on a comma-separated list of patterns matching files and/or directories."
+    required: false
+    type: string
+    default: "vendor/"
+  php-version:
+    description: "PHP version to be used for running phpcs and phpcbf"
+    required: false
+    type: string
+    default: "8.2"
+  standard:
+    description: "The name of, or the path to, the coding standard to use. Can be a comma-separated list specifying multiple standards."
+    required: false
+    type: string
+    default: "" # if left empty, .github/linters/phpcs.xml or https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml will be used
+
+outputs:
+  branch-name:
+    description: "The branch where changes were committed"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }} # Fetch latest changes (even by previous job)
+        fetch-depth: 0 # Fetch all history for all branches and tags. Otherwise github.event.pull_request.base.ref SHA isn't found.
+
+    # Fetch latest changes (even by previous job)
+    - name: Fetch latest changes
+      run: git pull origin ${{ github.ref }}
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: "${{ inputs.php-version }}"
+        tools: composer:v2
+
+    - name: "Use the latest PHPCS version"
+      run: composer require --dev squizlabs/php_codesniffer --prefer-dist --no-progress
+
+    - name: Run PHP Code Sniffer
+      id: phpcs
+      run: |
+        # Check if the repo has its own phpcs.xml config file
+        if [ -f .github/linters/phpcs.xml ]; then
+          standard=".github/linters/phpcs.xml"
+        else
+          # Fallback to the action’s default phpcs.xml template.
+          # In a GitHub Action, GITHUB_ACTION_PATH points to the action’s source directory.
+          standard="$GITHUB_ACTION_PATH/.github/linters/super-linter-templates-phpcs.xml"
+          # Which is a copy of https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml
+        fi
+        vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="${{ inputs.standard || $standard }}" --ignore="${{ inputs.ignore }}" || HAS_ISSUES=true
+        # because of `||`, the previous command always exit 0
+
+        # Default the variable if no issues were found
+        : "${HAS_ISSUES:=false}"
+        echo "HAS_ISSUES=$HAS_ISSUES" >> "$GITHUB_ENV"
+      shell: bash
+
+    - name: Run PHP Code Beautifier if needed
+      if: env.HAS_ISSUES == 'true'
+      run: |
+        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard=.github/linters/phpcs.xml --ignore=vendor/ || echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+
+        # restore composer.json before staging the changes
+        git checkout composer.json
+        git add .
+
+        # Determine branch name based on commit-changes input
+        if ${{ inputs.commit-changes }}; then
+          BRANCH_NAME=$(git branch --show-current)
+          NOTICE_MESSAGE="A PHPCBF commit was successfully added to the current branch: $BRANCH_NAME"
+        else
+          # name includes timestamp and short_hash
+          BRANCH_NAME="phpcbf/fix-$(date +'%y%m%d%H%M%S')-$(git rev-parse --short HEAD)"
+          git checkout -b "$BRANCH_NAME"
+          echo "::warning title=New branch created::Consider pull request for a new branch: $BRANCH_NAME (or delete it)"
+          NOTICE_MESSAGE="A PHPCBF commit was successfully added to the new branch: $BRANCH_NAME"
+        fi
+
+        # Configure Git user
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        # Commit and push changes with custom message
+        git commit -m "${{ inputs.commit-message }} on $(date +'%Y-%m-%d %H:%M:%S') UTC"
+        git push origin "$BRANCH_NAME"
+        echo "::notice title=Commit added::$NOTICE_MESSAGE"
+
+        # Set branch name as output
+        echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+      shell: bash
