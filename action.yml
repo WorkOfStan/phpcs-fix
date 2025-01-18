@@ -62,6 +62,7 @@ runs:
     # Fetch latest changes (even by previous job)
     - name: Fetch latest changes
       run: git pull origin ${{ github.ref }}
+      shell: bash
 
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
@@ -71,6 +72,7 @@ runs:
 
     - name: "Use the latest PHPCS version"
       run: composer require --dev squizlabs/php_codesniffer --prefer-dist --no-progress
+      shell: bash
 
     - name: Run PHP Code Sniffer
       id: phpcs
@@ -84,7 +86,13 @@ runs:
           standard="$GITHUB_ACTION_PATH/.github/linters/super-linter-templates-phpcs.xml"
           # Which is a copy of https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml
         fi
-        vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="${{ inputs.standard || $standard }}" --ignore="${{ inputs.ignore }}" || HAS_ISSUES=true
+        # Use inputs.standard if provided (non-empty), otherwise fall back to $standard.
+        if [ -n "${{ inputs.standard }}" ]; then
+          use_standard="${{ inputs.standard }}"
+        else
+          use_standard="$standard"
+        fi
+        vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="$use_standard" --ignore="${{ inputs.ignore }}" || HAS_ISSUES=true
         # because of `||`, the previous command always exit 0
 
         # Default the variable if no issues were found
