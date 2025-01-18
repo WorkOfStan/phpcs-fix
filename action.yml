@@ -45,6 +45,10 @@ inputs:
     required: false
     type: string
     default: "" # if left empty, .github/linters/phpcs.xml or https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml will be used
+  stop-on-manual-fix:
+    description: "If true, the execution will stop when manual fixes are necessary."
+    type: boolean
+    default: false
 
 outputs:
   branch-name:
@@ -112,8 +116,13 @@ runs:
         # Check for fixable changes
         if [ -z "$(git status --porcelain)" ]; then
           echo "::warning title=No fixable errors were found by phpcbf::Manual fix necessary. Compare to the PHP Code Sniffer section above."
-          # Exiting gracefully
-          exit 0
+          if [ "${{ inputs.stop-on-manual-fix }}" = "true" ]; then
+            # Indicates an error
+            exit 1
+          else
+            # Exiting gracefully
+            exit 0
+          fi
           # The rest of the script must still be within the same step to really stop the execution
         fi
 

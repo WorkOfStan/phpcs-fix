@@ -14,9 +14,12 @@ This action can either commit changes directly to the current branch or create a
 
 This action is designed to be used as a _reusable workflow_. You can call it from another workflow in your repository or simply add [the provided YAML configuration](.github/workflows/phpcs-phpcbf.yml) to your repository.
 
-By default, if needed, a new branch with a name starting with `prettier/fix` will be created, making it easy to review and merge the fixes into your main branch.
+By default, if necessary, a new branch with a name starting with `phpcbf/fix` will be created, making it easy to review and merge fixes into your main branch.
 
-Note: This action is not blocking, so the status remains green even if changes are proposed in the form of a new branch. Then it’s up to you to either create a pull request to merge the changes or delete the branch.
+Note 1: This action is non-blocking, so the status remains green even when changes are proposed via a new branch.
+A notice message is displayed, and it is then up to you to either create a pull request to merge the changes or delete the branch.
+
+Note 2: However, you can mandate the action to stop if manual fixes are necessary by setting the input parameter `stop-on-manual-fix: true`.
 
 ### Permissions
 
@@ -37,6 +40,7 @@ permissions:
 | `ignore`         | Ignore files based on a comma-separated list of patterns matching files and/or directories.                                  | String  | `vendor/`                                                                                                                                                                                                                                                                                            |
 | `php-version`    | The PHP version to use, e.g. `"8.2"`.                                                                                        | String  | `"8.2"`                                                                                                                                                                                                                                                                                              |
 | `standard`       | The name of, or the path to, the coding standard to use. Can be a comma-separated list specifying multiple standards.        | String  | The project's `.github/linters/phpcs.xml` (where Super-linter expects it) with fallback to <https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml> copied to [.github/linters/super-linter-templates-phpcs.xml](.github/linters/super-linter-templates-phpcs.xml) will be used. |
+| `stop-on-manual-fix`       | If true, the execution will stop when manual fixes are necessary. | Boolean | `false`                                                                                                                                                                                                                                                                                              |
 
 ### Outputs
 

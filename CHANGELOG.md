@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added` for new features
 
+- The new boolean input `stop-on-manual-fix` will cause the workflow to stop (fail) if manual fixes are necessary.
+
 ### `Changed` for changes in existing functionality
 
 ### `Deprecated` for soon-to-be removed features
