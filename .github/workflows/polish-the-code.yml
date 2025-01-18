@@ -1,0 +1,37 @@
+---
+name: Polish the code
+
+on:
+  push:
+    branches-ignore:
+      # notest branches to ignore testing of partial online commits
+      - "notest/**"
+
+  pull_request:
+    branches-ignore:
+      # notest branches to ignore testing of partial online commits
+      - "notest/**"
+
+permissions:
+  # only prettier-fix needs write permission, for others read is enough
+  contents: read
+
+jobs:
+  prettier-fix:
+    # Note: runs-on doesn't accept all expressions, so a string is used
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: write
+    # Limit the running time
+    timeout-minutes: 10
+    steps:
+      - name: Invoke the Prettier fix
+        uses: WorkOfStan/prettier-fix@v1.1.0
+        with:
+          commit-changes: true
+
+  super-linter:
+    needs: prettier-fix
+    uses: WorkOfStan/seablast-actions/.github/workflows/linter.yml@v0.2.1
+    with:
+      runs-on: "ubuntu-24.04"

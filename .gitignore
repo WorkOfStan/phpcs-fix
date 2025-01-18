@@ -1,0 +1,6 @@
+#disable dependency files
+/composer.lock
+
+#disable IDE files
+/nbproject/
+/.idea/
