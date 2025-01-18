@@ -155,7 +155,7 @@ runs:
 
         # Set branch name as output
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-        
+
         # Stop with an error if some manual fixes are required on top of automatic fixes
         if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
           exit 1
