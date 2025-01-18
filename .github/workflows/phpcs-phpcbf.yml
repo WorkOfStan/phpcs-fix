@@ -1,5 +1,5 @@
 ---
-name: Prettier-fix
+name: Phpcs-fix
 on: [pull_request, push]
 
 permissions:
@@ -13,6 +13,6 @@ jobs:
     steps:
       - name: Invoke the PHPCS check and PHPCBF fix
         # Use the latest commit in the main branch.
-        uses: WorkOfStan/phpcs-fix@notest/init
+        uses: WorkOfStan/phpcs-fix@feature/init
         with:
           commit-changes: true
