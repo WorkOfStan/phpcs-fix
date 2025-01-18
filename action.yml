@@ -77,21 +77,20 @@ runs:
     - name: Run PHP Code Sniffer
       id: phpcs
       run: |
-        # Check if the repo has its own phpcs.xml config file
-        if [ -f .github/linters/phpcs.xml ]; then
-          standard=".github/linters/phpcs.xml"
-        else
-          # Fallback to the action’s default phpcs.xml template.
-          # In a GitHub Action, GITHUB_ACTION_PATH points to the action’s source directory.
-          standard="$GITHUB_ACTION_PATH/.github/linters/super-linter-templates-phpcs.xml"
-          # Which is a copy of https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml
-        fi
-        # Use inputs.standard if provided (non-empty), otherwise fall back to $standard.
+        # Determine which coding standard to use.
+        # Priority:
+        #   1. Use inputs.standard if provided (non-empty).
+        #   2. If not, use the repository's own phpcs.xml if available.
+        #   3. Otherwise, fall back to the action's default template. Which is a copy of https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml
         if [ -n "${{ inputs.standard }}" ]; then
           use_standard="${{ inputs.standard }}"
+        elif [ -f .github/linters/phpcs.xml ]; then
+          use_standard=".github/linters/phpcs.xml"
         else
-          use_standard="$standard"
+          use_standard="$GITHUB_ACTION_PATH/.github/linters/super-linter-templates-phpcs.xml"          
         fi
+        echo "USE_STANDARD=$use_standard" >> "$GITHUB_ENV"
+        echo "standard=${{ env.USE_STANDARD }}"
         vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="$use_standard" --ignore="${{ inputs.ignore }}" || HAS_ISSUES=true
         # because of `||`, the previous command always exit 0
 
@@ -103,7 +102,7 @@ runs:
     - name: Run PHP Code Beautifier if needed
       if: env.HAS_ISSUES == 'true'
       run: |
-        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard=.github/linters/phpcs.xml --ignore=vendor/ || echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
 
         # restore composer.json before staging the changes
         git checkout composer.json
