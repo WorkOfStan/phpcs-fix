@@ -108,12 +108,14 @@ runs:
       if: env.HAS_ISSUES == 'true'
       run: |
         echo "phpcbf standard=${{ env.USE_STANDARD }}"
-        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
-        : "${MORE_ISSUES:=false}"
-        if [ "${MORE_ISSUES}" = "true" ]; then
+        PHPCBF_EXIT_CODE=0
+        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || PHPCBF_EXIT_CODE=$?
+        ##: "${MORE_ISSUES:=false}"
+        if [ ${PHPCBF_EXIT_CODE} -ne 0 ]; then
+        ##if [ "${MORE_ISSUES}" = "true" ]; then
           #echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
           # todo investigate when this happens
-          echo "::warning title=Non-zero code exit of phpcbf::Manual fix necessary?"
+          echo "::warning title=Non-zero code exit of phpcbf ${PHPCBF_EXIT_CODE}::Manual fix necessary?"
         fi
 
         # restore composer.json before staging the changes
