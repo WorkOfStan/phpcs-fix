@@ -110,12 +110,15 @@ runs:
         echo "phpcbf standard=${{ env.USE_STANDARD }}"
         PHPCBF_EXIT_CODE=0
         vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || PHPCBF_EXIT_CODE=$?
-        ##: "${MORE_ISSUES:=false}"
+        "${MORE_ISSUES:=false}"
         if [ ${PHPCBF_EXIT_CODE} -ne 0 ]; then
-        ##if [ "${MORE_ISSUES}" = "true" ]; then
-          #echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
-          # todo investigate when this happens
-          echo "::warning title=Non-zero code exit of phpcbf ${PHPCBF_EXIT_CODE}::Manual fix necessary?"
+          echo "::notice title=Non-zero code exit of phpcbf = ${PHPCBF_EXIT_CODE}::phpcbf wasn't idle"
+  
+          vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="$use_standard" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
+          # because of `||`, the previous command always exit 0
+          if [ "${MORE_ISSUES}" = "true" ]; then
+            echo "::warning title=Some phpcs issues remained.::Manual fix necessary."
+          fi
         fi
 
         # restore composer.json before staging the changes
@@ -161,7 +164,7 @@ runs:
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
         ## Stop with an error if some manual fixes are required on top of automatic fixes
-        #if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
-        #  exit 1
-        #fi
+        if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
+          exit 1
+        fi
       shell: bash
