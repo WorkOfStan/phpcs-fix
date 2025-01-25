@@ -113,7 +113,7 @@ runs:
         "${MORE_ISSUES:=false}"
         if [ ${PHPCBF_EXIT_CODE} -ne 0 ]; then
           echo "::notice title=Non-zero code exit of phpcbf = ${PHPCBF_EXIT_CODE}::phpcbf wasn't idle"
-  
+
           vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="$use_standard" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
           # because of `||`, the previous command always exit 0
           if [ "${MORE_ISSUES}" = "true" ]; then
