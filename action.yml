@@ -84,7 +84,7 @@ runs:
         # path to Checkout working directory is /home/runner/work/repo-name/repo-name , so just add /vendor/
         path: ${{ github.workspace }}/vendor/
         # Use composer.json for key, if composer.lock is not committed.
-        key: ${{ runner.os }}-PHP${{ inputs.php-version }}-vendor-${{ hashFiles('**/composer.json') }}
+        key: phpcs-fix-${{ runner.os }}-PHP${{ inputs.php-version }}-vendor-${{ hashFiles('**/composer.json') }}
 
     - name: "Use the latest PHPCS version"
       if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
@@ -124,12 +124,12 @@ runs:
         MORE_ISSUES=false
         vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || PHPCBF_EXIT_CODE=$?
         if [ ${PHPCBF_EXIT_CODE} -ne 0 ]; then
-          echo "::notice title=Non-zero code exit of phpcbf = ${PHPCBF_EXIT_CODE}::phpcbf wasn't idle"
+          echo "::notice title=phpcbf wasn't idle::Non-zero code exit of phpcbf = ${PHPCBF_EXIT_CODE} ... phpcbf wasn't idle"
 
           vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="$use_standard" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
           # because of `||`, the previous command always exit 0
           if [ "${MORE_ISSUES}" = "true" ]; then
-            echo "::warning title=Some phpcs issues remained.::Manual fix necessary."
+            echo "::warning title=Some phpcs issues remained.::Some phpcs issues remained. Manual fix necessary."
           fi
         fi
 
@@ -138,7 +138,7 @@ runs:
 
         # Check for fixable changes
         if [ -z "$(git status --porcelain)" ]; then
-          echo "::warning title=No fixable errors were found by phpcbf::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+          echo "::warning title=No fixable errors were found by phpcbf::No fixable errors were found by phpcbf: Manual fix necessary. Compare to the PHP Code Sniffer section above."
           if [ "${{ inputs.stop-on-manual-fix }}" = "true" ]; then
             # Indicates an error
             exit 1
@@ -159,7 +159,7 @@ runs:
           # name includes timestamp and short_hash
           BRANCH_NAME="phpcbf/fix-$(date +'%y%m%d%H%M%S')-$(git rev-parse --short HEAD)"
           git checkout -b "$BRANCH_NAME"
-          echo "::warning title=New branch created::Consider pull request for a new branch: $BRANCH_NAME (or delete it)"
+          echo "::warning title=New branch created::New branch created: Consider pull request for a new branch: $BRANCH_NAME (or delete it)"
           NOTICE_MESSAGE="A PHPCBF commit was successfully added to the new branch: $BRANCH_NAME"
         fi
 
