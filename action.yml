@@ -45,6 +45,10 @@ inputs:
     required: false
     type: string
     default: "" # if left empty, .github/linters/phpcs.xml or https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml will be used
+  stop-on-manual-fix:
+    description: "If true, the execution will stop when manual fixes are necessary."
+    type: boolean
+    default: false
 
 outputs:
   branch-name:
@@ -70,8 +74,20 @@ runs:
         php-version: "${{ inputs.php-version }}"
         tools: composer:v2
 
-    # todo consider using cache
+    # https://github.com/actions/cache
+    # A repository can have up to 10 GB of caches. Once the 10 GB limit is reached, older caches will be evicted based on when the cache was last accessed.
+    # Caches that are not accessed within the last week will also be evicted.
+    - name: Cache composer dependencies
+      uses: actions/cache@v4
+      id: vendor-cache
+      with:
+        # path to Checkout working directory is /home/runner/work/repo-name/repo-name , so just add /vendor/
+        path: ${{ github.workspace }}/vendor/
+        # Use composer.json for key, if composer.lock is not committed.
+        key: phpcs-fix-${{ runner.os }}-PHP${{ inputs.php-version }}-vendor-${{ hashFiles('**/composer.json') }}
+
     - name: "Use the latest PHPCS version"
+      if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
       run: composer require --dev squizlabs/php_codesniffer --prefer-dist --no-progress
       shell: bash
 
@@ -104,16 +120,32 @@ runs:
       if: env.HAS_ISSUES == 'true'
       run: |
         echo "phpcbf standard=${{ env.USE_STANDARD }}"
-        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || echo "::warning title=Some phpcs issues remained::Manual fix necessary. Compare to the PHP Code Sniffer section above."
+        PHPCBF_EXIT_CODE=0
+        MORE_ISSUES=false
+        vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || PHPCBF_EXIT_CODE=$?
+        if [ ${PHPCBF_EXIT_CODE} -ne 0 ]; then
+          echo "::notice title=phpcbf wasn't idle::Non-zero code exit of phpcbf = ${PHPCBF_EXIT_CODE} ... phpcbf wasn't idle"
+
+          vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
+          # because of `||`, the previous command always exit 0
+          if [ "${MORE_ISSUES}" = "true" ]; then
+            echo "::warning title=Some phpcs issues remained.::Some phpcs issues remained. Manual fix necessary."
+          fi
+        fi
 
         # restore composer.json before staging the changes
         git checkout composer.json
 
         # Check for fixable changes
         if [ -z "$(git status --porcelain)" ]; then
-          echo "::warning title=No fixable errors were found by phpcbf::Manual fix necessary. Compare to the PHP Code Sniffer section above."
-          # Exiting gracefully
-          exit 0
+          echo "::warning title=No fixable errors were found by phpcbf::No fixable errors were found by phpcbf: Manual fix necessary. Compare to the PHP Code Sniffer section above."
+          if [ "${{ inputs.stop-on-manual-fix }}" = "true" ]; then
+            # Indicates an error
+            exit 1
+          else
+            # Exiting gracefully
+            exit 0
+          fi
           # The rest of the script must still be within the same step to really stop the execution
         fi
 
@@ -127,7 +159,7 @@ runs:
           # name includes timestamp and short_hash
           BRANCH_NAME="phpcbf/fix-$(date +'%y%m%d%H%M%S')-$(git rev-parse --short HEAD)"
           git checkout -b "$BRANCH_NAME"
-          echo "::warning title=New branch created::Consider pull request for a new branch: $BRANCH_NAME (or delete it)"
+          echo "::warning title=New branch created::New branch created: Consider pull request for a new branch: $BRANCH_NAME (or delete it)"
           NOTICE_MESSAGE="A PHPCBF commit was successfully added to the new branch: $BRANCH_NAME"
         fi
 
@@ -142,4 +174,9 @@ runs:
 
         # Set branch name as output
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+        ## Stop with an error if some manual fixes are required on top of automatic fixes
+        if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
+          exit 1
+        fi
       shell: bash

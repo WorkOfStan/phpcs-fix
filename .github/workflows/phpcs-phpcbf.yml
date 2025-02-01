@@ -16,3 +16,4 @@ jobs:
         uses: WorkOfStan/phpcs-fix@main
         with:
           commit-changes: true
+          stop-on-manual-fix: true
