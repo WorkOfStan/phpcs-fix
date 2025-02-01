@@ -9,6 +9,8 @@ This action can either commit changes directly to the current branch or create a
 - **Automatic Fixes:** Check PHP files for coding standard violations and attempts to automatically fix them when possible.
 - **Flexible Committing:** Creates a new branch (prefixed with `phpcbf/fix`) if changes are required, making it easy to review and merge. Or you can set the input parameter `commit-changes: true` to commit to the current branch. (Recommendation: start with committing to another branch and review in order to avoid surprises. Then commit to the same branch for incremental changes.)
 - **Configurable:** Adjust extensions, ignore and standard parameters of phpcs. Adjust PHP version, or commit-message.
+- **Caching:** Cache `vendor/` (for a unique combination of php-version and composer.json) after a successful run in order to speed up further runs.
+- **Action chain:** Either leave this GitHub Action non-blocking or set `stop-on-manual-fix` according to your automation process needs.
 
 ## Usage
 
