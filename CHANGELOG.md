@@ -9,9 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Added` for new features
 
-- The new boolean input `stop-on-manual-fix` will cause the workflow to stop (fail) if manual fixes are necessary.
-- Also stop with an error if some manual fixes are required on top of automatic fixes.
-
 ### `Changed` for changes in existing functionality
 
 ### `Deprecated` for soon-to-be removed features
@@ -21,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Fixed` for any bugfixes
 
 ### `Security` in case of vulnerabilities
+
+## [1.1.0] - 2025-02-01
+
+### Added
+
+- The new boolean input `stop-on-manual-fix` will cause the workflow to stop (fail) if manual fixes are necessary.
+- Also stop with an error if some manual fixes are required on top of automatic fixes.
+- Cache `vendor/` (for a unique combination of php-version and composer.json) after a successful run in order to speed up further runs.
 
 ## [1.0.0] - 2025-01-18
 
@@ -33,5 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notice about a successful commit.
 - **Checkout code**: Fetches the latest changes so that modifications from a previous job are included, enabling seamless job chaining.
 
-[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.0...HEAD?w=1
+[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.1.0...HEAD?w=1
+[1.1.0]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.0...v1.1.0?w=1
 [1.0.0]: https://github.com/WorkOfStan/phpcs-fix/releases/tag/v1.0.0
