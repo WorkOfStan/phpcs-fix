@@ -19,14 +19,14 @@ permissions:
 jobs:
   prettier-fix:
     # Note: runs-on doesn't accept all expressions, so a string is used
-    runs-on: "ubuntu-24.04"
+    runs-on: "ubuntu-latest"
     permissions:
       contents: write
     # Limit the running time
     timeout-minutes: 10
     steps:
       - name: Invoke the Prettier fix
-        uses: WorkOfStan/prettier-fix@v1.1.0
+        uses: WorkOfStan/prettier-fix@v1.1.1
         with:
           commit-changes: true
 
@@ -34,4 +34,4 @@ jobs:
     needs: prettier-fix
     uses: WorkOfStan/seablast-actions/.github/workflows/linter.yml@v0.2.1
     with:
-      runs-on: "ubuntu-24.04"
+      runs-on: "ubuntu-latest"
