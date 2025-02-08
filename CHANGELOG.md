@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Security` in case of vulnerabilities
 
+## [1.0.1] - 2025-02-09
+
+### Added
+
+- notice the commit URL
+
 ## [1.0.0] - 2025-02-01
 
 - This GitHub Action automates PHPCS formatting across your project, ensuring consistent code styling by creating a new branch for review when necessary. It simplifies integrating PHPCS/PHPCBF into your workflow.
@@ -32,5 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The new boolean input `stop-on-manual-fix` will cause the workflow to stop (fail) if manual fixes are necessary. (Also stops with an error if some manual fixes are required on top of automatic fixes.)
 - Cached `vendor/` (for a unique combination of php-version and composer.json) after a successful run in order to speed up further runs.
 
-[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.0...HEAD?w=1
+[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.1...HEAD?w=1
+[1.0.1]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.0...v1.0.1?w=1
 [1.0.0]: https://github.com/WorkOfStan/phpcs-fix/releases/tag/v1.0.0
