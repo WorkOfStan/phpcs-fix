@@ -124,12 +124,12 @@ runs:
         MORE_ISSUES=false
         vendor/bin/phpcbf --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || PHPCBF_EXIT_CODE=$?
         if [ ${PHPCBF_EXIT_CODE} -ne 0 ]; then
-          echo "::notice title=phpcbf wasn't idle::Non-zero code exit of phpcbf = ${PHPCBF_EXIT_CODE} ... phpcbf wasn't idle"
+          echo "::notice title=PHPCBF wasn't idle::Non-zero code exit of phpcbf = ${PHPCBF_EXIT_CODE} (phpcbf wasn't idle)"
 
           vendor/bin/phpcs --extensions="${{ inputs.extensions }}" . --standard="${{ env.USE_STANDARD }}" --ignore="${{ inputs.ignore }}" || MORE_ISSUES=true
           # because of `||`, the previous command always exit 0
           if [ "${MORE_ISSUES}" = "true" ]; then
-            echo "::warning title=Some phpcs issues remained.::Some phpcs issues remained. Manual fix necessary."
+            echo "::warning title=Some PHPCS issues remained.::Some phpcs issues remained. Manual fix necessary."
           fi
         fi
 
@@ -138,7 +138,7 @@ runs:
 
         # Check for fixable changes
         if [ -z "$(git status --porcelain)" ]; then
-          echo "::warning title=No fixable errors were found by phpcbf::No fixable errors were found by phpcbf: Manual fix necessary. Compare to the PHP Code Sniffer section above."
+          echo "::warning title=No fixable errors were found by PHPCBF::No fixable errors were found by phpcbf: Manual fix necessary. Compare to the PHP Code Sniffer section above."
           if [ "${{ inputs.stop-on-manual-fix }}" = "true" ]; then
             # Indicates an error
             exit 1
@@ -170,7 +170,9 @@ runs:
         # Commit and push changes with custom message
         git commit -m "${{ inputs.commit-message }} on $(date +'%Y-%m-%d %H:%M:%S') UTC"
         git push origin "$BRANCH_NAME"
-        echo "::notice title=Commit added::$NOTICE_MESSAGE"
+        echo "::notice title=PHPCBF commit added::${NOTICE_MESSAGE}"
+        COMMIT_URL=${{ github.server_url }}/${{ github.repository }}/commit/$(git rev-parse HEAD)
+        echo "::notice title=View the PHPCBF commit::${COMMIT_URL}"
 
         # Set branch name as output
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT

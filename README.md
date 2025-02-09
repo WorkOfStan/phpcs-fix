@@ -11,6 +11,7 @@ This action can either commit changes directly to the current branch or create a
 - **Configurable:** Adjust extensions, ignore and standard parameters of phpcs. Adjust PHP version, or commit-message.
 - **Caching:** Cache `vendor/` (for a unique combination of php-version and composer.json) after a successful run in order to speed up further runs.
 - **GitHub Action Chain:** Either leave this GitHub Action non-blocking or set `stop-on-manual-fix` according to your automation process needs.
+- **Direct link to a new commit:** A URL to the new commit is displayed as a notice to allow for a quick check of what's been changed.
 
 ## Usage
 
