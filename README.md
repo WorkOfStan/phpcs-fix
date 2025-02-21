@@ -59,3 +59,5 @@ To optimize execution time, the `vendor` folder is cached, allowing dependencies
 - The runner's OS and PHP version – to account for environment-specific variations.
 
 This approach enables cache sharing across branches. However, if the `composer.json` file in the referenced branch (e.g., `dev`) changes, it's recommended to **invalidate the cache** to ensure a fresh `vendor` folder is built from scratch.
+
+The cache name (key) is `phpcs-fix-${{ runner.os }}-PHP${{ inputs.php-version }}-vendor-${{ hashFiles('**/composer.json') }}`
