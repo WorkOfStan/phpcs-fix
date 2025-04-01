@@ -50,3 +50,14 @@ permissions:
 | Output        | Description                         |
 | ------------- | ----------------------------------- |
 | `branch-name` | The name of the branch created/used |
+
+## Caching Mechanism
+
+To optimize execution time, the `vendor` folder is cached, allowing dependencies to be reused across workflow runs. The cache key is generated based on:
+
+- `composer.json` – to track dependency changes.
+- The runner's OS and PHP version – to account for environment-specific variations.
+
+This approach enables cache sharing across branches. However, if the `composer.json` file in the referenced branch (e.g., `dev`) changes, it's recommended to **invalidate the cache** to ensure a fresh `vendor` folder is built from scratch.
+
+The cache name (key) is `phpcs-fix-${{ runner.os }}-PHP${{ inputs.php-version }}-vendor-${{ hashFiles('**/composer.json') }}`
