@@ -12,6 +12,11 @@ on:
       # notest branches to ignore testing of partial online commits
       - "notest/**"
 
+  schedule:
+    # Run the workflow at 6:30 AM UTC on the 18th of every month
+    - cron: "30 6 18 * *"
+    # Scheduled runs do not commit-changes automatically to the same branch
+
 permissions:
   # only prettier-fix needs write permission, for others read is enough
   contents: read
@@ -28,7 +33,7 @@ jobs:
       - name: Invoke the Prettier fix
         uses: WorkOfStan/prettier-fix@v1.1.3
         with:
-          commit-changes: true
+          commit-changes: ${{ github.event_name != 'schedule' }}
 
   super-linter:
     needs: prettier-fix
