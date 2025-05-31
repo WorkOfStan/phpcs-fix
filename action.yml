@@ -108,6 +108,7 @@ runs:
         git show-ref
         echo "Debug 4. Check Your Current Checked-out Reference"
         git status
+      shell: bash
 
     - name: Run PHP Code Sniffer
       id: phpcs
