@@ -19,6 +19,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Security` in case of vulnerabilities
 
+## [1.0.2] - 2025-05-31
+
+fix: Fix pull request issues
+
+### Added
+
+- debug info (list of branches)
+- outputs `changed-files` with a comma-separated list of files changed by phpcbf
+
+### Fixed
+
+- Prevents issues with changing files in detached HEAD states (during pull request) by committing to the source branch of the pull request.
+
 ## [1.0.1] - 2025-02-09
 
 ### Added
@@ -38,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The new boolean input `stop-on-manual-fix` will cause the workflow to stop (fail) if manual fixes are necessary. (Also stops with an error if some manual fixes are required on top of automatic fixes.)
 - Cached `vendor/` (for a unique combination of php-version and composer.json) after a successful run in order to speed up further runs.
 
-[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.1...HEAD?w=1
+[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.2...HEAD?w=1
+[1.0.2]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.1...v1.0.2?w=1
 [1.0.1]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.0...v1.0.1?w=1
 [1.0.0]: https://github.com/WorkOfStan/phpcs-fix/releases/tag/v1.0.0
