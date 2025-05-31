@@ -227,8 +227,10 @@ runs:
         echo "changed-files=" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Debug changed files
+    - name: Debug GITHUB_OUTPUT
       if: ${{ inputs.debug == 'true' }}
       run: |
-        echo "changed-files=${CHANGED_FILES}"
+      run: |
+        echo "— Contents of GITHUB_OUTPUT file —"
+        cat "$GITHUB_OUTPUT"
       shell: bash
