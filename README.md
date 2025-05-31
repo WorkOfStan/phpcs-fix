@@ -39,6 +39,7 @@ permissions:
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `commit-changes`     | If set to `true`, the action will commit changes to the current branch; otherwise a new branch is created for manual review. | Boolean | `false`                                                                                                                                                                                                                                                                                              |
 | `commit-message`     | Commit message to use if the action commits changes.                                                                         | String  | `"PHP Code Beautifier fixes applied automatically"`                                                                                                                                                                                                                                                  |
+| `debug`              | Enable extra debug output (list of branches).                                                                                | Boolean | `false`                                                                                                                                                                                                                                                                                              |
 | `extensions`         | Comma-delimited list of file extensions to be sniffed. Note: an empty value will disable checking.                           | String  | `"php"` (defaults to PHP only; other file types must be specified)                                                                                                                                                                                                                                   |
 | `ignore`             | Ignore files based on a comma-separated list of patterns matching files and/or directories.                                  | String  | `vendor/`                                                                                                                                                                                                                                                                                            |
 | `php-version`        | The PHP version to use, e.g. `"8.2"`.                                                                                        | String  | `"8.2"`                                                                                                                                                                                                                                                                                              |
@@ -47,9 +48,10 @@ permissions:
 
 ### Outputs
 
-| Output        | Description                         |
-| ------------- | ----------------------------------- |
-| `branch-name` | The name of the branch created/used |
+| Output          | Description                                     |
+| --------------- | ----------------------------------------------- |
+| `branch-name`   | The name of the branch created/used             |
+| `changed-files` | Comma-separated list of files changed by phpcbf |
 
 ## Caching Mechanism
 

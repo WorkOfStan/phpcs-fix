@@ -20,6 +20,10 @@ inputs:
     description: "Commit message for the changes"
     type: string
     default: "PHP Code Beautifier fixes applied automatically"
+  debug:
+    description: "Enable extra debug output"
+    type: boolean
+    default: false
   # https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Advanced-Usage#specifying-valid-file-extensions
   # By default, PHP_CodeSniffer will check any file it finds with a .inc, .php, .js or .css extension, although not all standards will actually check all these file types.
   # Empty value means no checking at all.
@@ -53,6 +57,8 @@ inputs:
 outputs:
   branch-name:
     description: "The branch where changes were committed"
+  changed-files:
+    description: "Comma-separated list of files changed by phpcbf"
 
 runs:
   using: "composite"
@@ -91,6 +97,19 @@ runs:
       run: composer require --dev squizlabs/php_codesniffer --prefer-dist --no-progress
       shell: bash
 
+    - name: Debug branches
+      if: ${{ inputs.debug == 'true' }}
+      run: |
+        echo "Debug 1. List All Local Branches"
+        git branch
+        echo "Debug 2. List All Remote Branches"
+        git branch -r
+        echo "Debug 3. List All References (Including Detached HEADs)"
+        git show-ref
+        echo "Debug 4. Check Your Current Checked-out Reference"
+        git status
+      shell: bash
+
     - name: Run PHP Code Sniffer
       id: phpcs
       run: |
@@ -113,10 +132,11 @@ runs:
 
         # Default the variable if no issues were found
         : "${HAS_ISSUES:=false}"
-        echo "HAS_ISSUES=$HAS_ISSUES" >> "$GITHUB_ENV"
+        echo "HAS_ISSUES=$HAS_ISSUES" >> $GITHUB_ENV
       shell: bash
 
     - name: Run PHP Code Beautifier if needed
+      id: fix
       if: env.HAS_ISSUES == 'true'
       run: |
         echo "phpcbf standard=${{ env.USE_STANDARD }}"
@@ -141,19 +161,34 @@ runs:
           echo "::warning title=No fixable errors were found by PHPCBF::No fixable errors were found by phpcbf: Manual fix necessary. Compare to the PHP Code Sniffer section above."
           if [ "${{ inputs.stop-on-manual-fix }}" = "true" ]; then
             # Indicates an error
+            # This sets the output named branch-name to an empty value. Which is useful to signal “no branch was created” in a way that downstream steps can detect reliably.
+            echo "branch-name=" >> $GITHUB_OUTPUT
+            echo "changed-files=" >> $GITHUB_OUTPUT
             exit 1
           else
             # Exiting gracefully
+            echo "branch-name=" >> $GITHUB_OUTPUT
+            echo "changed-files=" >> $GITHUB_OUTPUT
             exit 0
           fi
           # The rest of the script must still be within the same step to really stop the execution
         fi
 
-        git add .
+        # Only add changed files, safe for spaces
+        git status --porcelain | awk '{print $2}' | while IFS= read -r file; do git add "$file"; done
 
         # Determine branch name based on commit-changes input
-        if ${{ inputs.commit-changes }}; then
-          BRANCH_NAME=$(git branch --show-current)
+        if [ "${{ inputs.commit-changes }}" == "true" ]; then
+          BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+          if [ "$BRANCH_NAME" == "HEAD" ] || [ -z "$BRANCH_NAME" ]; then
+            echo "Detached HEAD detected. Checking out the PR branch directly from origin..."
+            # Fetch the PR branch tip and force a local branch matching the remote head
+            # Note: ${{ github.head_ref }} is a GitHub Actions built-in variable that contains the name of the source branch of a pull request (PR).
+            #   It is only available during workflow runs triggered by pull_request events.
+            git fetch origin ${{ github.head_ref }} --depth=1
+            git checkout -B "${{ github.head_ref }}" "origin/${{ github.head_ref }}"
+            BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+          fi
           NOTICE_MESSAGE="A PHPCBF commit was successfully added to the current branch: $BRANCH_NAME"
         else
           # name includes timestamp and short_hash
@@ -174,11 +209,23 @@ runs:
         COMMIT_URL=${{ github.server_url }}/${{ github.repository }}/commit/$(git rev-parse HEAD)
         echo "::notice title=View the PHPCBF commit::${COMMIT_URL}"
 
-        # Set branch name as output
+        # Set outputs
+        CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD | tr '\n' ',' | sed 's/,$//')
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+        echo "changed-files=${CHANGED_FILES}" >> $GITHUB_OUTPUT
+        if [ "${{ inputs.debug }}" = "true" ]; then
+          echo "changed-files=${CHANGED_FILES}"
+        fi
 
         ## Stop with an error if some manual fixes are required on top of automatic fixes
         if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
           exit 1
         fi
+      shell: bash
+
+    - name: No changes output (when no fix needed)
+      if: steps.fix.outcome == 'skipped'
+      run: |
+        echo "branch-name=" >> $GITHUB_OUTPUT
+        echo "changed-files=" >> $GITHUB_OUTPUT
       shell: bash
