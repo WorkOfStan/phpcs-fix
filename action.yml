@@ -97,7 +97,7 @@ runs:
       run: composer require --dev squizlabs/php_codesniffer --prefer-dist --no-progress
       shell: bash
 
-    - name: Debug branches (optional)
+    - name: Debug branches
       if: ${{ inputs.debug == 'true' }}
       run: |
         echo "Debug 1. List All Local Branches"
@@ -225,4 +225,10 @@ runs:
       run: |
         echo "branch-name=" >> $GITHUB_OUTPUT
         echo "changed-files=" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Debug changed files
+      if: ${{ inputs.debug == 'true' }}
+      run: |
+        echo "changed-files=${CHANGED_FILES}"
       shell: bash
