@@ -213,6 +213,9 @@ runs:
         CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD | tr '\n' ',' | sed 's/,$//')
         echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
         echo "changed-files=${CHANGED_FILES}" >> $GITHUB_OUTPUT
+        if [ "${{ inputs.debug }}" = "true" ]; then
+          echo "changed-files=${CHANGED_FILES}"
+        fi
 
         ## Stop with an error if some manual fixes are required on top of automatic fixes
         if [ "${{ inputs.stop-on-manual-fix }}" = "true" ] && [ "${MORE_ISSUES}" = "true" ]; then
@@ -225,11 +228,4 @@ runs:
       run: |
         echo "branch-name=" >> $GITHUB_OUTPUT
         echo "changed-files=" >> $GITHUB_OUTPUT
-      shell: bash
-
-    - name: Debug GITHUB_OUTPUT
-      if: ${{ inputs.debug == 'true' }}
-      run: |
-        echo "— Contents of GITHUB_OUTPUT file —"
-        cat "$GITHUB_OUTPUT"
       shell: bash
