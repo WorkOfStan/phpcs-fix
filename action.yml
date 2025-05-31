@@ -230,7 +230,6 @@ runs:
     - name: Debug GITHUB_OUTPUT
       if: ${{ inputs.debug == 'true' }}
       run: |
-      run: |
         echo "— Contents of GITHUB_OUTPUT file —"
         cat "$GITHUB_OUTPUT"
       shell: bash
