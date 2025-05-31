@@ -48,9 +48,9 @@ permissions:
 
 ### Outputs
 
-| Output        | Description                         |
-| ------------- | ----------------------------------- |
-| `branch-name` | The name of the branch created/used |
+| Output          | Description                                     |
+| --------------- | ----------------------------------------------- |
+| `branch-name`   | The name of the branch created/used             |
 | `changed-files` | Comma-separated list of files changed by phpcbf |
 
 ## Caching Mechanism
