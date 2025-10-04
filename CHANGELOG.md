@@ -17,11 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Fixed` for any bugfixes
 
+fix: Tags MUST NOT trigger the GitHub Action.
+
+### Fixed
+
+- Trigger changed to ignore tags. I.e. change of the original trigger `on: [pull_request, push]` which caught also tags. (When running on a tag, actions/checkout runs on refs/tags/vX.Y.Z, so you end up with a detached HEAD, and github.head_ref is empty (it only exists on pull_request).)
+
 ### `Security` in case of vulnerabilities
 
 ## [1.0.3] - 2025-10-04
 
-- feat: the default commit message made compliant with Conventional Commits
+feat: the default commit message made compliant with Conventional Commits
 
 ### Changed
 
