@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Security` in case of vulnerabilities
 
+## [1.0.3] - 2025-10-04
+
+- feat: the default commit message made compliant with Conventional Commits
+
+### Changed
+
+- the default commit message made compliant with [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- chore(super-linter): Bumps [super-linter/super-linter](https://github.com/super-linter/super-linter) from 8.1.0 to 8.2.0.
+
 ## [1.0.2] - 2025-05-31
 
 fix: Fix pull request issues
@@ -51,7 +60,8 @@ fix: Fix pull request issues
 - The new boolean input `stop-on-manual-fix` will cause the workflow to stop (fail) if manual fixes are necessary. (Also stops with an error if some manual fixes are required on top of automatic fixes.)
 - Cached `vendor/` (for a unique combination of php-version and composer.json) after a successful run in order to speed up further runs.
 
-[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.2...HEAD?w=1
+[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.3...HEAD?w=1
+[1.0.3]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.2...v1.0.3?w=1
 [1.0.2]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.1...v1.0.2?w=1
 [1.0.1]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.0...v1.0.1?w=1
 [1.0.0]: https://github.com/WorkOfStan/phpcs-fix/releases/tag/v1.0.0
