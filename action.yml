@@ -19,7 +19,7 @@ inputs:
   commit-message:
     description: "Commit message for the changes"
     type: string
-    default: "chore(phpcf): PHP Code Beautifier fixes applied automatically"
+    default: "chore(phpcf): apply PHP Code Beautifier fixes automatically"
   debug:
     description: "Enable extra debug output"
     type: boolean
@@ -63,6 +63,10 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Display version
+      run: echo "phpcs-fix::v1.0.4 running"
+      shell: bash
+
     - name: Checkout code
       uses: actions/checkout@v5
       with:

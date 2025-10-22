@@ -1,6 +1,16 @@
 ---
 name: Phpcs-fix
-on: [pull_request, push]
+
+on:
+  push:
+    branches-ignore:
+      # notest branches to ignore testing of partial online commits
+      - "notest/**"
+
+  pull_request:
+    branches-ignore:
+      # notest branches to ignore testing of partial online commits
+      - "notest/**"
 
 permissions:
   contents: write
@@ -12,8 +22,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Invoke the PHPCS check and PHPCBF fix
-        # Use the latest commit in the main branch.
-        uses: WorkOfStan/phpcs-fix@main
+        # Use the latest minor version within the current major version.
+        uses: WorkOfStan/phpcs-fix@v1
         with:
           commit-changes: true
           #debug: true
