@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed` for changes in existing functionality
 
+- ci(GitHub): bump actions/checkout to v6 and actions/cache to v5
+
 ### `Deprecated` for soon-to-be removed features
 
 ### `Removed` for now removed features
