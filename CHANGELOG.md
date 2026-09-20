@@ -29,7 +29,7 @@ fix(action): wire composite action outputs
 
 ### Changed
 
-- ci(GitHub): bump actions/checkout to v7
+- ci(GitHub): bump actions/checkout to v7 and actions/cache to v5
 - docs(README): add PHPCS customization examples, common standards guidance, and troubleshooting notes
 - shorten subject to fit most 80 characters
 
