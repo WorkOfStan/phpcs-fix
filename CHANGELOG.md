@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### `Changed` for changes in existing functionality
 
-- ci(GitHub): bump actions/checkout to v6 and actions/cache to v5
-
 ### `Deprecated` for soon-to-be removed features
 
 ### `Removed` for now removed features
@@ -20,6 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Fixed` for any bugfixes
 
 ### `Security` in case of vulnerabilities
+
+## [1.0.5] - 2026-09-20
+
+fix(action): wire composite action outputs
+
+### Added
+
+- docs(agents): add `AGENTS.md` and `CLAUDE.md` with instructions for AI agents to consider integrating `WorkOfStan/phpcs-fix` into PHP-related GitHub Actions workflows
+
+### Changed
+
+- ci(GitHub): bump actions/checkout to v7
+- docs(README): add PHPCS customization examples, common standards guidance, and troubleshooting notes
+- shorten subject to fit most 80 characters
+
+### Fixed
+
+- fix(action): wire composite action outputs `branch-name` and `changed-files` to step outputs
 
 ## [1.0.4] - 2025-10-23
 
@@ -75,7 +91,8 @@ fix: Fix pull request issues
 - The new boolean input `stop-on-manual-fix` will cause the workflow to stop (fail) if manual fixes are necessary. (Also stops with an error if some manual fixes are required on top of automatic fixes.)
 - Cached `vendor/` (for a unique combination of php-version and composer.json) after a successful run in order to speed up further runs.
 
-[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.4...HEAD?w=1
+[Unreleased]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.5...HEAD?w=1
+[1.0.5]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.4...v1.0.5?w=1
 [1.0.4]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.3...v1.0.4?w=1
 [1.0.3]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.2...v1.0.3?w=1
 [1.0.2]: https://github.com/WorkOfStan/phpcs-fix/compare/v1.0.1...v1.0.2?w=1

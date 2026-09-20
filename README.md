@@ -46,12 +46,71 @@ permissions:
 | `standard`           | The name of, or the path to, the coding standard to use. Can be a comma-separated list specifying multiple standards.        | String  | The project's `.github/linters/phpcs.xml` (where Super-linter expects it) with fallback to <https://github.com/super-linter/super-linter/blob/main/TEMPLATES/phpcs.xml> copied to [.github/linters/super-linter-templates-phpcs.xml](.github/linters/super-linter-templates-phpcs.xml) will be used. |
 | `stop-on-manual-fix` | If true, the execution will stop when manual fixes are necessary.                                                            | Boolean | `false`                                                                                                                                                                                                                                                                                              |
 
+### Customizing PHPCS
+
+The `extensions`, `ignore`, and `standard` inputs are passed directly to `phpcs` and `phpcbf`, so you can adapt this action to your project without forking it.
+
+If `standard` is not set, the action uses the first available option in this order:
+
+1. The value from `with.standard`
+2. Your repository's `.github/linters/phpcs.xml`
+3. The bundled Super-Linter-compatible fallback ruleset
+
+Example configuration:
+
+```yaml
+jobs:
+  phpcs-phpcbf:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Run PHPCS fix with custom options
+        uses: WorkOfStan/phpcs-fix@v1
+        with:
+          commit-changes: true
+          extensions: 'php,phtml,inc'
+          ignore: 'vendor/*,storage/*,bootstrap/cache/*'
+          standard: 'PSR12'
+```
+
+Examples by input:
+
+- `extensions`: `php,phtml,inc` checks only files with those extensions. Do not include dots. An empty value disables checking. Only include extensions that your selected standard and installed sniffs can actually process.
+- `ignore`: `vendor/*,*/tests/fixtures/*,*\.blade\.php` skips vendor code, fixture directories, and matching templates. PHPCS treats these patterns like regular expressions, so escape literal dots such as `\.` when needed.
+- `standard`: `PSR12` uses a built-in standard, `.phpcs.xml` or `.github/linters/phpcs.xml` points to a custom ruleset in your repository, and `PSR12,Squiz` runs multiple installed standards together.
+
+For more details about these PHPCS arguments, see the official documentation for [specifying a coding standard](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Usage#specifying-a-coding-standard), [valid file extensions](https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#specifying-valid-file-extensions), [ignore patterns](https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#ignoring-files-and-folders), and [custom rulesets](https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset).
+
+### Common Standards
+
+| Standard | When to use it | Documentation |
+| -------- | -------------- | ------------- |
+| `PSR12` | A good default for modern PHP applications and libraries. | [PSR-12 specification](https://www.php-fig.org/psr/psr-12/) |
+| `PEAR` | Useful for projects that already follow PEAR-style conventions or need compatibility with older codebases. | [PEAR Coding Standards](https://pear.php.net/manual/en/standards.php) |
+| `Squiz` | Stricter built-in PHPCS standard with broader formatting and consistency checks than PSR-12. | [PHPCS usage and installed standards](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Usage#printing-a-list-of-installed-coding-standards) |
+| `Zend` | Helpful for legacy Zend Framework style codebases that already align with that convention. | [PHPCS usage and installed standards](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Usage#printing-a-list-of-installed-coding-standards) |
+| Custom ruleset | Best when your team needs project-specific sniffs, exclusions, or severity overrides. | [Annotated ruleset reference](https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset) |
+
+If you are not sure where to start, try `standard: 'PSR12'` first and move to a project-local ruleset when you need exceptions or additional sniffs.
+
 ### Outputs
 
 | Output          | Description                                     |
 | --------------- | ----------------------------------------------- |
 | `branch-name`   | The name of the branch created/used             |
 | `changed-files` | Comma-separated list of files changed by phpcbf |
+
+## Troubleshooting
+
+Common messages and what they usually mean:
+
+- `No fixable errors were found by PHPCBF`: PHPCS found violations, but none of them were automatically fixable. Review the PHPCS report in the workflow log and fix those issues manually or relax the rules in your custom ruleset.
+- `Some PHPCS issues remained. Manual fix necessary.`: PHPCBF fixed part of the report, but some sniffs still require manual changes. Keep `stop-on-manual-fix: true` if you want the workflow to fail in this situation.
+- `The "<standard>" coding standard is not installed` or `Referenced sniff ... does not exist`: The selected standard or one of its sniffs is unavailable in the installed PHPCS setup. Use a built-in standard such as `PSR12`, commit your ruleset file into the repository, or install the external standard with Composer before this action runs.
+- PHPCS reports no scanned files or appears to skip everything: Check that `extensions` is not empty and that `ignore` patterns are not too broad. For example, `extensions: 'php'` only checks `.php` files, while `extensions: ''` disables checking entirely.
+
+When debugging a custom setup, it also helps to run PHPCS locally with the same arguments or enable `debug: true` in the action to inspect branch-related workflow details.
 
 ## Caching Mechanism
 

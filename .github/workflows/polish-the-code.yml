@@ -28,22 +28,27 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      issues: write # so that it can actually write pr-comments
+      # so that it can actually write pr-comments
+      issues: write
     # Limit the running time
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }} # checkout PR HEAD commit
-          fetch-depth: 0 # required for merge-base check
+          # checkout PR HEAD commit
+          ref: ${{ github.event.pull_request.head.sha }}
+          # required for merge-base check
+          fetch-depth: 0
           persist-credentials: false
       - uses: commit-check/commit-check-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # use GITHUB_TOKEN because use of pr-comments
+          # use GITHUB_TOKEN because use of pr-comments
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           message: true
           # to accept dependabot/github_actions/*
-          # branch: false # todo might not be necessary as "dependabot[bot]" author is ignored
+          # but might not be necessary as "dependabot[bot]" author is ignored
+          # branch: false
           author-name: true
           author-email: true
           job-summary: true
@@ -64,6 +69,6 @@ jobs:
 
   super-linter:
     needs: [prettier-fix, commit-check]
-    uses: WorkOfStan/seablast-actions/.github/workflows/linter.yml@v0.2.7
+    uses: WorkOfStan/seablast-actions/.github/workflows/linter.yml@v0.2.11
     with:
       runs-on: "ubuntu-latest"

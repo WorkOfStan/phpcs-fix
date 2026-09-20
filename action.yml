@@ -19,7 +19,7 @@ inputs:
   commit-message:
     description: "Commit message for the changes"
     type: string
-    default: "chore(phpcf): apply PHP Code Beautifier fixes automatically"
+    default: "chore(phpcf): apply PHP Code Beautifier fixes"
   debug:
     description: "Enable extra debug output"
     type: boolean
@@ -57,14 +57,16 @@ inputs:
 outputs:
   branch-name:
     description: "The branch where changes were committed"
+    value: ${{ steps.fix.outputs.branch-name || steps.no-changes.outputs.branch-name }}
   changed-files:
     description: "Comma-separated list of files changed by phpcbf"
+    value: ${{ steps.fix.outputs.changed-files || steps.no-changes.outputs.changed-files }}
 
 runs:
   using: "composite"
   steps:
     - name: Display version
-      run: echo "phpcs-fix::v1.0.4 running"
+      run: echo "phpcs-fix::v1.0.5 running"
       shell: bash
 
     - name: Checkout code
@@ -228,6 +230,7 @@ runs:
       shell: bash
 
     - name: No changes output (when no fix needed)
+      id: no-changes
       if: steps.fix.outcome == 'skipped'
       run: |
         echo "branch-name=" >> $GITHUB_OUTPUT
