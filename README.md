@@ -150,9 +150,9 @@ Composer resolves a PHPCS version compatible with the project's PHP and dependen
 
 The cache key includes:
 
-- The runner's OS.
-- The `php-version` input.
-- The hash of files matching `**/composer.json`.
+- The runner's OS (to account for environment-specific variations).
+- The `php-version` input (to account for environment-specific variations).
+- The hash of files matching `**/composer.json` (to track dependency changes).
 
 The cache name (key) is `phpcs-fix-${{ runner.os }}-PHP${{ inputs.php-version }}-vendor-${{ hashFiles('**/composer.json') }}`.
 
