@@ -38,7 +38,7 @@ permissions:
 | Input                | Description                                                                                                                  | Type    | Default                                                                                                                                                                                                                                                                                              |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `commit-changes`     | If set to `true`, the action will commit changes to the current branch; otherwise a new branch is created for manual review. | Boolean | `false`                                                                                                                                                                                                                                                                                              |
-| `commit-message`     | Commit message prefix; the action appends a UTC timestamp (`on YYYY-MM-DD HH:MM:SS UTC`).                                                                         | String  | `"chore(phpcf): apply PHP Code Beautifier fixes"`                                                                                                                                                                                                                                      |
+| `commit-message`     | Commit message prefix; the action appends a UTC timestamp (`on YYYY-MM-DD HH:MM:SS UTC`).                                    | String  | `"chore(phpcf): apply PHP Code Beautifier fixes"`                                                                                                                                                                                                                                                    |
 | `debug`              | Enable extra debug output (list of branches).                                                                                | Boolean | `false`                                                                                                                                                                                                                                                                                              |
 | `extensions`         | Comma-delimited list of file extensions to be sniffed. Note: an empty value will disable checking.                           | String  | `"php"` (defaults to PHP only; other file types must be specified)                                                                                                                                                                                                                                   |
 | `ignore`             | Ignore files based on a comma-separated list of patterns matching files and/or directories.                                  | String  | `vendor/`                                                                                                                                                                                                                                                                                            |
@@ -69,9 +69,9 @@ jobs:
         uses: WorkOfStan/phpcs-fix@v1
         with:
           commit-changes: true
-          extensions: 'php,phtml,inc'
-          ignore: 'vendor/*,storage/*,bootstrap/cache/*'
-          standard: 'PSR12'
+          extensions: "php,phtml,inc"
+          ignore: "vendor/*,storage/*,bootstrap/cache/*"
+          standard: "PSR12"
 ```
 
 Examples by input:
@@ -101,20 +101,20 @@ Select it explicitly in the workflow step:
 - name: Run PHPCS fix with a custom ruleset
   uses: WorkOfStan/phpcs-fix@v1
   with:
-    standard: '.phpcs.xml'
+    standard: ".phpcs.xml"
 ```
 
 This example keeps PSR12 checks except the line-length sniff. Use `vendor/bin/phpcs -s` locally with your ruleset to see sniff codes in reports. See the [annotated ruleset reference](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset) for more exclusion options.
 
 ### Common Standards
 
-| Standard | When to use it | Documentation |
-| -------- | -------------- | ------------- |
-| `PSR12` | A good default for modern PHP applications and libraries. | [PSR-12 specification](https://www.php-fig.org/psr/psr-12/) |
-| `PEAR` | Useful for projects that already follow PEAR-style conventions or need compatibility with older codebases. | [PEAR Coding Standards](https://pear.php.net/manual/en/standards.php) |
-| `Squiz` | Stricter built-in PHPCS standard with broader formatting and consistency checks than PSR-12. | [PHPCS usage and installed standards](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Usage#printing-a-list-of-installed-coding-standards) |
-| `Zend` | Helpful for legacy Zend Framework style codebases that already align with that convention. | [PHPCS usage and installed standards](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Usage#printing-a-list-of-installed-coding-standards) |
-| Custom ruleset | Best when your team needs project-specific sniffs, exclusions, or severity overrides. | [Annotated ruleset reference](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset) |
+| Standard       | When to use it                                                                                             | Documentation                                                                                                                                     |
+| -------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PSR12`        | A good default for modern PHP applications and libraries.                                                  | [PSR-12 specification](https://www.php-fig.org/psr/psr-12/)                                                                                       |
+| `PEAR`         | Useful for projects that already follow PEAR-style conventions or need compatibility with older codebases. | [PEAR Coding Standards](https://pear.php.net/manual/en/standards.php)                                                                             |
+| `Squiz`        | Stricter built-in PHPCS standard with broader formatting and consistency checks than PSR-12.               | [PHPCS usage and installed standards](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Usage#printing-a-list-of-installed-coding-standards) |
+| `Zend`         | Helpful for legacy Zend Framework style codebases that already align with that convention.                 | [PHPCS usage and installed standards](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Usage#printing-a-list-of-installed-coding-standards) |
+| Custom ruleset | Best when your team needs project-specific sniffs, exclusions, or severity overrides.                      | [Annotated ruleset reference](https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset)                                           |
 
 If you are not sure where to start, try `standard: 'PSR12'` first and move to a project-local ruleset when you need exceptions or additional sniffs.
 
