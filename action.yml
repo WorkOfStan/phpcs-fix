@@ -98,7 +98,7 @@ runs:
         # Use composer.json for key, if composer.lock is not committed.
         key: phpcs-fix-${{ runner.os }}-PHP${{ inputs.php-version }}-vendor-${{ hashFiles('**/composer.json') }}
 
-    - name: "Use the latest PHPCS version"
+    - name: "Install PHPCS on cache miss"
       if: ${{ steps.vendor-cache.outputs.cache-hit != 'true' }}
       run: composer require --dev squizlabs/php_codesniffer --prefer-dist --no-progress
       shell: bash

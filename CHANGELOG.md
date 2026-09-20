@@ -26,16 +26,19 @@ fix(action): wire composite action outputs
 ### Added
 
 - docs(agents): add `AGENTS.md` and `CLAUDE.md` with instructions for AI agents to consider integrating `WorkOfStan/phpcs-fix` into PHP-related GitHub Actions workflows
+- Add a custom ruleset example that excludes an individual sniff and selects it through the standard input.
 
 ### Changed
 
 - ci(GitHub): bump actions/checkout to v7 and actions/cache to v5
 - docs(README): add PHPCS customization examples, common standards guidance, and troubleshooting notes
 - shorten subject to fit most 80 characters
+- Clarify the maintained PHPCS Composer package and cache reuse behavior, and rename the installation step to reflect cache misses.
 
 ### Fixed
 
 - fix(action): wire composite action outputs `branch-name` and `changed-files` to step outputs
+- Correct README action terminology, commit-message defaults, fallback ruleset and failure descriptions, and maintained documentation links.
 
 ## [1.0.4] - 2025-10-23
 
