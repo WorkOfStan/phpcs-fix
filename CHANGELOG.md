@@ -31,14 +31,14 @@ fix(action): wire composite action outputs
 ### Changed
 
 - ci(GitHub): bump actions/checkout to v7 and actions/cache to v6
-- docs(README): add PHPCS customization examples, common standards guidance, and troubleshooting notes
+- docs(readme): add PHPCS customization examples, common standards guidance, and troubleshooting notes
 - shorten subject to fit most 80 characters
 - Clarify the maintained PHPCS Composer package and cache reuse behavior, and rename the installation step to reflect cache misses.
 
 ### Fixed
 
 - fix(action): wire composite action outputs `branch-name` and `changed-files` to step outputs
-- Correct README action terminology, commit-message defaults, fallback ruleset and failure descriptions, and maintained documentation links.
+- Correct readme action terminology, commit-message defaults, fallback ruleset and failure descriptions, and maintained documentation links.
 
 ## [1.0.4] - 2025-10-23
 
