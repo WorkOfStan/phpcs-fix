@@ -30,7 +30,7 @@ fix(action): wire composite action outputs
 
 ### Changed
 
-- ci(GitHub): bump actions/checkout to v7 and actions/cache to v5
+- ci(GitHub): bump actions/checkout to v7 and actions/cache to v6
 - docs(README): add PHPCS customization examples, common standards guidance, and troubleshooting notes
 - shorten subject to fit most 80 characters
 - Clarify the maintained PHPCS Composer package and cache reuse behavior, and rename the installation step to reflect cache misses.
